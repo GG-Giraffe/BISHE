@@ -15,8 +15,24 @@ namespace TradePlay
         public void OnTurnEnter(TurnContext context)
         {
             context.Log.Print($"玩家回合开始（第 {context.RoundIndex} 回合）");
-            DrawCards(context, drawCount);
-            context.Log.Print("等待玩家操作，点击「结束回合」进入敌方回合。");
+            GuestView guest = FindObjectOfType<GuestView>();
+            if (guest != null)
+            {
+                guest.PresentNextIntent();
+            }
+
+            CardZone zone = FindObjectOfType<CardZone>();
+            if (zone != null)
+            {
+                int drawn = zone.Draw(drawCount);
+                context.Log.Print($"给玩家发牌 x{drawn}");
+            }
+            else
+            {
+                DrawCards(context, drawCount);
+            }
+
+            context.Log.Print("点击手牌打出，点击「结束回合」弃掉剩余手牌并消耗倒计时。");
         }
 
         public void OnTurnExit(TurnContext context)

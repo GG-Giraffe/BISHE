@@ -17,6 +17,9 @@ namespace TradePlay
         [SerializeField] Sprite hitSprite;
         [SerializeField] Image portraitImage;
 
+        [Header("倒计时")]
+        [SerializeField] int initialCountdown = 10;
+
         [Header("名字")]
         [SerializeField] string guestName = "示例客人";
         [SerializeField] bool nameVisible = true;
@@ -61,6 +64,25 @@ namespace TradePlay
         [SerializeField] Transform effectAnchor;
 
         bool _nameHovered;
+
+        public int InterestCurrent => Mathf.Max(0, interestCurrent);
+        public int InterestStageMax => Mathf.Max(1, interestStageMax);
+        public int InterestStage => Mathf.Max(1, interestStage);
+        public int InterestStageLimit => Mathf.Max(1, interestStageLimit);
+        public int Shield => Mathf.Max(0, shieldValue);
+        public int InitialCountdown => Mathf.Max(0, initialCountdown);
+        public GuestIntentKind IntentKind => intentKind;
+        public int IntentAttackValue => Mathf.Max(0, intentAttackValue);
+
+        public void SetCombatNumbers(int current, int stageMax, int stage, int stageLimit, int shield)
+        {
+            interestCurrent = Mathf.Max(0, current);
+            interestStageMax = Mathf.Max(1, stageMax);
+            interestStage = Mathf.Max(1, stage);
+            interestStageLimit = Mathf.Max(1, stageLimit);
+            shieldValue = Mathf.Max(0, shield);
+            RefreshVisuals();
+        }
 
         void Awake()
         {
@@ -138,6 +160,18 @@ namespace TradePlay
             nameText.gameObject.SetActive(show);
         }
 
+        public void PresentNextIntent()
+        {
+            intentVisible = true;
+            RefreshIntent();
+        }
+
+        public void HideIntent()
+        {
+            intentVisible = false;
+            RefreshIntent();
+        }
+
         void RefreshIntent()
         {
             if (intentArea != null)
@@ -147,11 +181,15 @@ namespace TradePlay
 
             if (intentIconImage != null)
             {
-                intentIconImage.sprite = intentIcon;
-                intentIconImage.enabled = intentIcon != null;
+                if (intentIcon != null)
+                {
+                    intentIconImage.sprite = intentIcon;
+                }
+
+                intentIconImage.enabled = intentVisible;
             }
 
-            bool showAttackValue = intentKind == GuestIntentKind.攻击;
+            bool showAttackValue = intentVisible && intentKind == GuestIntentKind.攻击;
             if (intentValueText != null)
             {
                 intentValueText.gameObject.SetActive(showAttackValue);

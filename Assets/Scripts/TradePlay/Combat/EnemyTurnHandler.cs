@@ -16,6 +16,12 @@ namespace TradePlay
         public void OnTurnEnter(TurnContext context)
         {
             context.Log.Print($"敌人回合开始（第 {context.RoundIndex} 回合）");
+            GuestView guest = FindObjectOfType<GuestView>();
+            if (guest != null)
+            {
+                guest.HideIntent();
+            }
+
             StartCoroutine(RunEnemyTurn(context));
         }
 
@@ -26,9 +32,21 @@ namespace TradePlay
 
         IEnumerator RunEnemyTurn(TurnContext context)
         {
-            ExecuteActions(context);
+            EffectQueue queue = FindObjectOfType<EffectQueue>();
+            if (queue != null)
+            {
+                queue.RunGuestAttack();
+            }
+            else
+            {
+                ExecuteActions(context);
+            }
+
             yield return new WaitForSeconds(actionDuration);
-            context.Manager.EndCurrentTurn();
+            if (!context.Manager.BattleEnded)
+            {
+                context.Manager.EndCurrentTurn();
+            }
         }
 
         protected virtual void ExecuteActions(TurnContext context)

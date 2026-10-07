@@ -18,6 +18,7 @@ namespace TradePlay
         int _roundIndex;
         TurnSide _currentSide = TurnSide.None;
         bool _turnLocked;
+        bool _battleEnded;
 
         public int RoundIndex => _roundIndex;
         public TurnSide CurrentSide => _currentSide;
@@ -82,11 +83,49 @@ namespace TradePlay
             EnterTurn(TurnSide.Player);
         }
 
-        public void EndCurrentTurn()
+        public bool BattleEnded => _battleEnded;
+
+        public void EndBattle(string message)
         {
-            if (_currentSide == TurnSide.None || _turnLocked)
+            if (_battleEnded)
             {
                 return;
+            }
+
+            _battleEnded = true;
+            _turnLocked = true;
+            if (log != null && !string.IsNullOrEmpty(message))
+            {
+                log.Print(message);
+            }
+
+            if (endTurnButton != null)
+            {
+                endTurnButton.interactable = false;
+            }
+        }
+
+        public void EndCurrentTurn()
+        {
+            if (_currentSide == TurnSide.None || _turnLocked || _battleEnded)
+            {
+                return;
+            }
+
+            if (_currentSide == TurnSide.Player)
+            {
+                CardBattleFlow flow = FindObjectOfType<CardBattleFlow>();
+                if (flow != null && flow.FinishPlayerTurn())
+                {
+                    _battleEnded = true;
+                    _turnLocked = true;
+                    if (endTurnButton != null)
+                    {
+                        endTurnButton.interactable = false;
+                    }
+
+                    return;
+                }
             }
 
             _turnLocked = true;

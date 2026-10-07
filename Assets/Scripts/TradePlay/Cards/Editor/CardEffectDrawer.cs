@@ -61,6 +61,9 @@ namespace TradePlay.Editor
                     line = NextLine(line);
                     EditorGUI.PropertyField(line, vfxId, new GUIContent("特效 ID"));
                     break;
+                case CardEffectKind.增加倒计时:
+                    DrawInt(ref line, value, "增加回合数");
+                    break;
             }
 
             line = NextLine(line);

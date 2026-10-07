@@ -53,6 +53,14 @@ namespace TradePlay
             RefreshVisuals();
         }
 
+        public CardData Data => cardData;
+
+        public void Bind(CardData data)
+        {
+            cardData = data;
+            RefreshVisuals();
+        }
+
         public void RefreshVisuals()
         {
             ApplyCardData();
